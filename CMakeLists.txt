@@ -92,6 +92,7 @@ endif()
 
 #---------------------------------File lists-----------------------------------
 set(source_files #All SeriousProton's objects to compile
+    src/campaign_client.cpp
     src/clipboard.cpp
     src/collisionable.cpp
     src/engine.cpp
@@ -192,7 +193,7 @@ target_compile_options(seriousproton_deps
 
 target_link_libraries(seriousproton_deps
     INTERFACE 
-        box2d lua glew ${SFML_LIBRARIES}
+        box2d lua glew pthread ${SFML_LIBRARIES}
         "$<$<BOOL:${WIN32}>:wsock32>"
         # LTO flag must be on the linker's list as well.
         "$<$<AND:$<BOOL:${CMAKE_COMPILER_IS_GNUCC}>,$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Release>>>:-flto>"
