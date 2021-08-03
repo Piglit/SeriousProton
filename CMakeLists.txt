@@ -12,6 +12,8 @@ option(SERIOUSPROTON_WITH_JSON "Use json library." OFF)
 if(WIN32)
     option(ENABLE_CRASH_LOGGER "Enable the Dr. MinGW crash logging facilities" OFF)
     set(DRMINGW_ROOT DRMINGW_ROOT-NOTFOUND CACHE PATH "Path to Dr. MinGW")
+    option(MINGW_STDTHREADS_GENERATE_STDHEADERS "" ON)
+    add_subdirectory(mingw-std-threads)
 endif()
 
 # Preflight checks.
@@ -89,6 +91,9 @@ add_subdirectory(src/libopus)
 if(SERIOUSPROTON_WITH_JSON)
     add_subdirectory(src/json11)
 endif()
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 #---------------------------------File lists-----------------------------------
 set(source_files #All SeriousProton's objects to compile
@@ -191,14 +196,28 @@ target_compile_options(seriousproton_deps
         "$<$<BOOL:${MSVC}>:/MP;/permissive->"
 )
 
-target_link_libraries(seriousproton_deps
-    INTERFACE 
-        box2d lua glew pthread ${SFML_LIBRARIES}
-        "$<$<BOOL:${WIN32}>:wsock32>"
-        # LTO flag must be on the linker's list as well.
-        "$<$<AND:$<BOOL:${CMAKE_COMPILER_IS_GNUCC}>,$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Release>>>:-flto>"
-        "$<BUILD_INTERFACE:opus;$<$<BOOL:${SERIOUSPROTON_WITH_JSON}>:json11>;$<$<NOT:$<BOOL:${ANDROID}>>:${CMAKE_DL_LIBS}>>"
-)
+if(MINGW)
+    target_link_libraries(seriousproton_deps
+        INTERFACE 
+            Threads::Threads
+            mingw_stdthreads
+            box2d lua glew ${SFML_LIBRARIES}
+            "$<$<BOOL:${WIN32}>:wsock32>"
+            # LTO flag must be on the linker's list as well.
+            "$<$<AND:$<BOOL:${CMAKE_COMPILER_IS_GNUCC}>,$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Release>>>:-flto>"
+            "$<BUILD_INTERFACE:opus;$<$<BOOL:${SERIOUSPROTON_WITH_JSON}>:json11>;$<$<NOT:$<BOOL:${ANDROID}>>:${CMAKE_DL_LIBS}>>"
+    )
+else()
+    target_link_libraries(seriousproton_deps
+        INTERFACE 
+            Threads::Threads
+            box2d lua glew ${SFML_LIBRARIES}
+            "$<$<BOOL:${WIN32}>:wsock32>"
+            # LTO flag must be on the linker's list as well.
+            "$<$<AND:$<BOOL:${CMAKE_COMPILER_IS_GNUCC}>,$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Release>>>:-flto>"
+            "$<BUILD_INTERFACE:opus;$<$<BOOL:${SERIOUSPROTON_WITH_JSON}>:json11>;$<$<NOT:$<BOOL:${ANDROID}>>:${CMAKE_DL_LIBS}>>"
+    )
+endif()
 
 if(NOT ANDROID)
     # Necessary for some older compilers (except on android, where the fs api isn't used)
