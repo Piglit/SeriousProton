@@ -139,6 +139,7 @@ set(source_files #All SeriousProton's objects to compile
     src/audio/source.cpp
     src/audio/sound.cpp
     src/audio/music.cpp
+    src/campaign_client.cpp
     src/clipboard.cpp
     src/collisionable.cpp
     src/engine.cpp
