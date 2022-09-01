@@ -2,7 +2,7 @@ name: CMake
 
 on:
   push:
-    branches: [spacelan22]
+    branches: [spacelan24]
   pull_request:
 
 jobs:
