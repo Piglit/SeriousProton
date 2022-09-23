@@ -4,6 +4,9 @@
 #include <memory>
 #include "multiplayer_server.h"
 
+class GameServerProxy;
+extern P<GameServerProxy> game_proxy;
+
 class GameServerProxy : public Updatable
 {
     sp::SystemTimer no_data_timeout;
