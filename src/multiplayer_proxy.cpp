@@ -1,11 +1,18 @@
 #include "multiplayer_proxy.h"
+#include "multiplayer_server.h"
 #include "multiplayer_internal.h"
 #include "engine.h"
 
 
+P<GameServerProxy> game_proxy;
+
 GameServerProxy::GameServerProxy(sp::io::network::Address hostname, int hostPort, string password, int listenPort, string proxyName)
 : password(password), proxyName(proxyName)
 {
+
+    SDL_assert(!game_server);
+    SDL_assert(!game_proxy);
+    game_proxy = this;
     LOG(INFO) << "Starting proxy server";
     mainSocket = std::make_unique<sp::io::network::TcpSocket>();
     if (!mainSocket->connect(hostname, static_cast<uint16_t>(hostPort)))
