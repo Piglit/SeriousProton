@@ -1,5 +1,6 @@
 #include "multiplayer_server.h"
 #include "multiplayer_client.h"
+#include "multiplayer_proxy.h"
 #include "multiplayer_internal.h"
 #include "multiplayer.h"
 #include "engine.h"
@@ -29,6 +30,7 @@ GameServer::GameServer(string server_name, int version_number, int listen_port)
 {
     SDL_assert(!game_server);
     SDL_assert(!game_client);
+    SDL_assert(!game_proxy);
     game_server = this;
     lastGameSpeed = engine->getGameSpeed();
     sendDataRate = 0.0f;
