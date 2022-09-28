@@ -33,7 +33,7 @@ public:
     std::map<string, std::vector<string> > getScenarioSettings(string name);
     std::vector<string> getShips();
     string getCampaignServerURL() { return campaign_server_hostname; }
-    void spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string ship_password);
+    void spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password);
 private:
     void httpGetNoResponse(string path);
     void httpPostNoResponse(string path, string body);
