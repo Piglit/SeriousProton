@@ -47,6 +47,8 @@ public:
     virtual void destroy() override;
 
     virtual void update(float delta) override;
+
+    string getProxyName() { return proxyName; }
 private:
     void sendAll(sp::io::DataBuffer& packet);
 
