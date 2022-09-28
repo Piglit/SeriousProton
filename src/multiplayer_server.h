@@ -104,6 +104,7 @@ public:
     inline float getSendDataRate() { return sendDataRate; }
     inline float getSendDataRatePerClient() { return sendDataRatePerClient; }
     inline float getUpdateTime() { return update_run_time; }
+    inline int getPort() { return listen_port; }
 
     string getServerName() { return server_name; }
     void setServerName(string name) { server_name = name; }
