@@ -42,6 +42,7 @@ private:
     nlohmann::json httpGetJson(string path);
 
     string httpRequest(const string& path, const string& body="", bool post = false);
+    const string getServerName();
     const string urlencode(const string&);
 };
 
