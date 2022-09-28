@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "campaign_client.h"
 #include "multiplayer_server.h"
+#include "multiplayer_proxy.h"
 #include <cctype>
 #include <iomanip>
 #include <sstream>
@@ -94,7 +95,7 @@ void CampaignClient::notifyCampaignServer(string event, nlohmann::json scenario_
 {
     nlohmann::json body = {
         {"scenario_info", scenario_info},
-        {"server_name", urlencode(game_server->getServerName())},
+        {"server_name", urlencode(getServerName())},
     };
     string path = "/"+event;
     httpPostNoResponse(path.c_str(), body.dump());
@@ -102,7 +103,7 @@ void CampaignClient::notifyCampaignServer(string event, nlohmann::json scenario_
 
 std::vector<string> CampaignClient::getScenarios()
 {
-    string path = string("/scenarios/")+urlencode(game_server->getServerName());
+    string path = string("/scenarios/")+urlencode(getServerName());
     LOG(INFO) << "loading scenarios from campaign server";
     auto result_json = httpGetJson(path);
     auto result_array = result_json["scenarios"];
@@ -117,7 +118,7 @@ std::vector<string> CampaignClient::getScenarios()
 
 std::map<string, string> CampaignClient::getScenarioInfo(string name)
 {
-    string path = string("/scenario_info/")+urlencode(game_server->getServerName())+"/"+urlencode(name);
+    string path = string("/scenario_info/")+urlencode(getServerName())+"/"+urlencode(name);
     auto result_json = httpGetJson(path);
     auto result_map = result_json["scenarioInfo"];
     std::map<string, string> kvpairs;
@@ -129,7 +130,7 @@ std::map<string, string> CampaignClient::getScenarioInfo(string name)
 
 std::map<string, std::vector<string> > CampaignClient::getScenarioSettings(string name)
 {
-    string path = string("/scenario_settings/")+urlencode(game_server->getServerName())+"/"+urlencode(name);
+    string path = string("/scenario_settings/")+urlencode(getServerName())+"/"+urlencode(name);
     auto result_json = httpGetJson(path);
     LOG(INFO) << result_json.dump();
     std::map<string, std::vector<string> > settings;
@@ -146,7 +147,7 @@ std::map<string, std::vector<string> > CampaignClient::getScenarioSettings(strin
 
 std::vector<string> CampaignClient::getShips()
 {
-    string path = string("/ships_available/")+urlencode(game_server->getServerName());
+    string path = string("/ships_available/")+urlencode(getServerName());
     auto result_json = httpGetJson(path);
     auto result_array = result_json["ships"];
     std::vector<string> elements;
@@ -156,15 +157,37 @@ std::vector<string> CampaignClient::getShips()
     return elements;
 }
 
-void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string ship_password){
+void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password, int x, int y, int rota){
     nlohmann::json body = {
         {"server_ip", server_ip},
         {"callsign", ship_name},
         {"template", ship_template},
+        {"drive", drive},
         {"password", ship_password},
+        {"x", x},
+        {"y", y},
+        {"rota", rota},
     };
     string uri = "/proxySpawn";
     httpPostNoResponse(uri.c_str(), body.dump());
+}
+
+void CampaignClient::destroyShipOnProxy(string server_ip, string ship_name){
+    nlohmann::json body = {
+        {"server_ip", server_ip},
+        {"callsign", ship_name},
+    };
+    string uri = "/proxyDestroy";
+    httpPostNoResponse(uri.c_str(), body.dump());
+}
+const string CampaignClient::getServerName(){
+    string name = "unknown";
+    if (game_server) {
+        name = game_server->getServerName();
+    } else if (game_proxy) {
+        name = game_proxy->getProxyName();
+    }
+    return name;
 }
 
 const string CampaignClient::urlencode(const string& value)
