@@ -34,6 +34,7 @@ public:
     std::vector<string> getShips();
     string getCampaignServerURL() { return campaign_server_hostname; }
     void spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password);
+    void destroyShipOnProxy(string server_ip, string ship_name);
 private:
     void httpGetNoResponse(string path);
     void httpPostNoResponse(string path, string body);
