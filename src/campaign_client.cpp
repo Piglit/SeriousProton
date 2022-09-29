@@ -169,6 +169,14 @@ void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string
     httpPostNoResponse(uri.c_str(), body.dump());
 }
 
+void CampaignClient::destroyShipOnProxy(string server_ip, string ship_name){
+    nlohmann::json body = {
+        {"server_ip", server_ip},
+        {"callsign", ship_name},
+    };
+    string uri = "/proxyDestroy";
+    httpPostNoResponse(uri.c_str(), body.dump());
+}
 const string CampaignClient::getServerName(){
     string name = "unknown";
     if (game_server) {
