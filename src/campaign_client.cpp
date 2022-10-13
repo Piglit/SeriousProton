@@ -157,7 +157,7 @@ std::vector<string> CampaignClient::getShips()
     return elements;
 }
 
-void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password, int x, int y){
+void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password, int x, int y, int rota){
     nlohmann::json body = {
         {"server_ip", server_ip},
         {"callsign", ship_name},
@@ -166,6 +166,7 @@ void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string
         {"password", ship_password},
         {"x", x},
         {"y", y},
+        {"rota", rota},
     };
     string uri = "/proxySpawn";
     httpPostNoResponse(uri.c_str(), body.dump());
