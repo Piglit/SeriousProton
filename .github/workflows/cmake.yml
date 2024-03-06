@@ -2,7 +2,7 @@ name: CMake
 
 on:
   push:
-    branches: [spacelan23]
+    branches: [shattered_horizon]
   pull_request:
 
 jobs:
