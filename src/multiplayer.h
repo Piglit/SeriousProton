@@ -107,6 +107,62 @@ template <typename T> struct multiplayerReplicationFunctions
         std::vector<T>* prev_data = *(std::vector<T>**)prev_data_ptr;
         delete prev_data;
     }
+
+    static bool isChangedMap(void* data, void* prev_data_ptr)
+    {
+        std::map<string,T>* ptr = (std::map<string,T>*)data;
+        std::map<string,T>* prev_data = *(std::map<string,T>**)prev_data_ptr;
+        bool changed = false;
+        if (prev_data->size() != ptr->size())
+        {
+            changed = true;
+        }else{
+            for(const auto& [key, value] : *ptr)
+//            for(const auto& keyvalue : *ptr) key=keyvalue.first, value=keyvalue.second
+            {
+                if ((*prev_data)[key] != value)
+                {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        if (changed)
+        {
+            prev_data->clear();
+            for(const auto& [key, value] : *ptr)
+               (*prev_data)[key] = value;
+            return true;
+        }
+        return false;
+    }
+    static void sendDataMap(void* data, sp::io::DataBuffer& packet)
+    {
+        std::map<string,T>* ptr = (std::map<string,T>*)data;
+        uint16_t count = ptr->size();
+        packet << count;
+        for(const auto& [key, value] : *ptr)
+            packet << key << value;
+    }
+    static void receiveDataMap(void* data, sp::io::DataBuffer& packet)
+    {
+        std::map<string,T>* ptr = (std::map<string,T>*)data;
+        uint16_t count;
+        packet >> count;
+        for(unsigned int n=0; n<count; n++)
+        {
+            string key;
+            T value;
+            packet >> key >> value;
+            (*ptr)[key] = value;
+        }
+    }
+    static void cleanupMap(void* prev_data_ptr)
+    {
+        std::map<string,T>* prev_data = *(std::map<string,T>**)prev_data_ptr;
+        delete prev_data;
+    }
+
 };
 
 template <typename T>
@@ -214,6 +270,25 @@ public:
         info.sendFunction = &multiplayerReplicationFunctions<T>::sendDataVector;
         info.receiveFunction = &multiplayerReplicationFunctions<T>::receiveDataVector;
         info.cleanupFunction = &multiplayerReplicationFunctions<T>::cleanupVector;
+        memberReplicationInfo.push_back(info);
+    }
+
+    template <typename T> void registerMemberReplication_(F_PARAM std::map<string,T>* member, float update_delay = 0.0f)
+    {
+        SDL_assert(!replicated);
+        SDL_assert(memberReplicationInfo.size() < 0xFFFF);
+        MemberReplicationInfo info;
+#ifdef DEBUG
+        info.name = name;
+#endif
+        info.ptr = member;
+        info.prev_data = reinterpret_cast<std::uint64_t>(new std::map<string,T>);
+        info.update_delay = update_delay;
+        info.update_timeout = 0.0f;
+        info.isChangedFunction = &multiplayerReplicationFunctions<T>::isChangedMap;
+        info.sendFunction = &multiplayerReplicationFunctions<T>::sendDataMap;
+        info.receiveFunction = &multiplayerReplicationFunctions<T>::receiveDataMap;
+        info.cleanupFunction = &multiplayerReplicationFunctions<T>::cleanupMap;
         memberReplicationInfo.push_back(info);
     }
 
