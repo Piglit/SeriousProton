@@ -23,15 +23,23 @@ class CampaignClient: public virtual PObject
 {
     string campaign_server_hostname;
     int campaign_server_port;
+    string instance_name;
+    string instance_name_url;
 
 public:
-    CampaignClient(string hostname, int port);
+    CampaignClient(string hostname, int port, string instance_name);
+    void setClientName(string client_name) {client_name = client_name;};
     bool isOnline();
-    void notifyCampaignServer(string event, nlohmann::json scenario_info);
+    void notifyCampaignServer(string event, nlohmann::json info);
+    void notifyCampaignServerScreen(string screen) {
+        notifyCampaignServer("screen", {{"screen", screen}});
+    };
     std::vector<string> getScenarios();
+    nlohmann::json getCampaign();
     std::map<string, string> getScenarioInfo(string name);
     std::map<string, std::vector<string> > getScenarioSettings(string name);
     std::vector<string> getShips();
+    string getBriefing();
     string getCampaignServerURL() { return campaign_server_hostname; }
     void spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password, int x, int y, int rota);
     void destroyShipOnProxy(string server_ip, string ship_name);
@@ -43,7 +51,6 @@ private:
     nlohmann::json httpGetJson(string path);
 
     string httpRequest(const string& path, const string& body="", bool post = false);
-    const string getServerName();
     const string urlencode(const string&);
 };
 
