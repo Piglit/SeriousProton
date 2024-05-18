@@ -9,7 +9,7 @@
 
 P<CampaignClient> campaign_client;
 
-CampaignClient::CampaignClient(string hostname, int port): campaign_server_hostname(hostname), campaign_server_port(port)
+CampaignClient::CampaignClient(string hostname, int port, string instance_name): campaign_server_hostname(hostname), campaign_server_port(port), instance_name(instance_name), instance_name_url(urlencode(instance_name))
 {
     campaign_client = this;
 }
@@ -91,19 +91,28 @@ nlohmann::json CampaignClient::httpGetJson(string path)
     return result_json;
 }
 
-void CampaignClient::notifyCampaignServer(string event, nlohmann::json scenario_info)
+void CampaignClient::notifyCampaignServer(string event, nlohmann::json info)
 {
-    nlohmann::json body = {
-        {"scenario_info", scenario_info},
-        {"server_name", urlencode(getServerName())},
-    };
+    string name = instance_name;
+    if (game_server) {
+        name = game_server->getServerName();
+    } else if (game_proxy) {
+        name = game_proxy->getProxyName();
+    }
+    info.update({
+        {"server", { 
+            {"instance_name", instance_name.c_str()},
+            {"crew_name", name.c_str()},
+            }
+        }
+    });
     string path = "/"+event;
-    httpPostNoResponse(path.c_str(), body.dump());
+    httpPostNoResponse(path.c_str(), info.dump());
 }
 
 std::vector<string> CampaignClient::getScenarios()
 {
-    string path = string("/scenarios/")+urlencode(getServerName());
+    string path = string("/scenarios/")+instance_name_url;
     LOG(INFO) << "loading scenarios from campaign server";
     auto result_json = httpGetJson(path);
     auto result_array = result_json["scenarios"];
@@ -116,9 +125,23 @@ std::vector<string> CampaignClient::getScenarios()
     return entries;
 }
 
+nlohmann::json CampaignClient::getCampaign()
+{
+    string name = instance_name;
+    if (game_server) {
+        name = game_server->getServerName();
+    } else if (game_proxy) {
+        name = game_proxy->getProxyName();
+    }
+
+    string path = string("/campaign/")+instance_name_url+"/"+urlencode(name);;
+    LOG(INFO) << "loading from campaign server";
+    return httpGetJson(path);
+}
+
 std::map<string, string> CampaignClient::getScenarioInfo(string name)
 {
-    string path = string("/scenario_info/")+urlencode(getServerName())+"/"+urlencode(name);
+    string path = string("/scenario_info/")+instance_name_url+"/"+urlencode(name);
     auto result_json = httpGetJson(path);
     auto result_map = result_json["scenarioInfo"];
     std::map<string, string> kvpairs;
@@ -130,7 +153,7 @@ std::map<string, string> CampaignClient::getScenarioInfo(string name)
 
 std::map<string, std::vector<string> > CampaignClient::getScenarioSettings(string name)
 {
-    string path = string("/scenario_settings/")+urlencode(getServerName())+"/"+urlencode(name);
+    string path = string("/scenario_settings/")+instance_name_url+"/"+urlencode(name);
     auto result_json = httpGetJson(path);
     LOG(INFO) << result_json.dump();
     std::map<string, std::vector<string> > settings;
@@ -147,7 +170,7 @@ std::map<string, std::vector<string> > CampaignClient::getScenarioSettings(strin
 
 std::vector<string> CampaignClient::getShips()
 {
-    string path = string("/ships_available/")+urlencode(getServerName());
+    string path = string("/ships_available/")+instance_name_url;
     auto result_json = httpGetJson(path);
     auto result_array = result_json["ships"];
     std::vector<string> elements;
@@ -155,6 +178,13 @@ std::vector<string> CampaignClient::getShips()
         elements.push_back(element.get<std::string>());
     }
     return elements;
+}
+
+string CampaignClient::getBriefing()
+{
+    string path = string("/briefing/")+instance_name_url;
+    auto result_json = httpGetJson(path);
+    return result_json["briefing"];
 }
 
 void CampaignClient::spawnShipOnProxy(string server_ip, string ship_name, string ship_template, string drive, string ship_password, int x, int y, int rota){
@@ -179,15 +209,6 @@ void CampaignClient::destroyShipOnProxy(string server_ip, string ship_name){
     };
     string uri = "/proxyDestroy";
     httpPostNoResponse(uri.c_str(), body.dump());
-}
-const string CampaignClient::getServerName(){
-    string name = "unknown";
-    if (game_server) {
-        name = game_server->getServerName();
-    } else if (game_proxy) {
-        name = game_proxy->getProxyName();
-    }
-    return name;
 }
 
 const string CampaignClient::urlencode(const string& value)
