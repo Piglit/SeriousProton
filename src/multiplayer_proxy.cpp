@@ -68,6 +68,7 @@ GameServerProxy::GameServerProxy(string password, int listenPort, string proxyNa
 
 GameServerProxy::~GameServerProxy()
 {
+    destroy();
 }
 
 void GameServerProxy::destroy()
@@ -75,6 +76,9 @@ void GameServerProxy::destroy()
     clientList.clear();
 
     broadcast_listen_socket.close();
+    listen_socket.close();
+
+    Updatable::destroy();
 }
 
 void GameServerProxy::update(float delta)
