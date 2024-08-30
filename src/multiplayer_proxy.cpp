@@ -68,6 +68,7 @@ GameServerProxy::GameServerProxy(string password, int listenPort, string proxyNa
 
 GameServerProxy::~GameServerProxy()
 {
+    destroy();
 }
 
 void GameServerProxy::destroy()
