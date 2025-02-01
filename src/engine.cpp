@@ -126,8 +126,8 @@ void Engine::runMainLoop()
                 }
             }
 #ifdef DEBUG
-            if (debug_output_timer.isExpired())
-                LOG(DEBUG) << "Object count: " << DEBUG_PobjCount << " " << updatableList.size();
+//            if (debug_output_timer.isExpired())
+//                LOG(DEBUG) << "Object count: " << DEBUG_PobjCount << " " << updatableList.size();
 #endif
 
             float delta = frame_timer.restart();
@@ -165,8 +165,8 @@ void Engine::runMainLoop()
             }
 
 #ifdef DEBUG
-            if (debug_output_timer.isExpired())
-                LOG(DEBUG) << "Object count: " << DEBUG_PobjCount << " " << updatableList.size();
+//            if (debug_output_timer.isExpired())
+//                LOG(DEBUG) << "Object count: " << DEBUG_PobjCount << " " << updatableList.size();
 #endif
 
             float delta = frame_timer.restart();
