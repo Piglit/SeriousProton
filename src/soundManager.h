@@ -65,10 +65,10 @@ public:
     float getMusicVolume();
 
     // Non-positional sounds
-    int playSound(string name, float pitch = 1.0f, float volume = 100.0f, bool loop = false);
+    int playSound(string name, float pitch = 1.0f, float volume = 50.0f, bool loop = false);
 
     // Positional sounds
-    int playSound(string name, glm::vec2 position, float min_distance, float attenuation, float pitch = 1.0f, float volume = 100.0f, bool loop = false);
+    int playSound(string name, glm::vec2 position, float min_distance, float attenuation, float pitch = 1.0f, float volume = 50.0f, bool loop = false);
     void setListenerPosition(glm::vec2 position, float angle);
     void disablePositionalSound();
 
