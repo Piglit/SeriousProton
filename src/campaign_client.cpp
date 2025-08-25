@@ -6,12 +6,14 @@
 #include <iomanip>
 #include <sstream>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 P<CampaignClient> campaign_client;
 
 CampaignClient::CampaignClient(string hostname, int port, string instance_name): campaign_server_hostname(hostname), campaign_server_port(port), instance_name(instance_name), instance_name_url(urlencode(instance_name))
 {
     campaign_client = this;
+    assert(std::regex_match(instance_name, std::regex("^[A-Za-z0-9\\-\\.]+$"))); // instance name must be a valid hostname
 }
 
 bool CampaignClient::isOnline() {
