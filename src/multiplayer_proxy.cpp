@@ -76,7 +76,7 @@ void GameServerProxy::destroy()
     clientList.clear();
 
     broadcast_listen_socket.close();
-    listen_socket.close();
+    listenSocket.close();
 
     Updatable::destroy();
 }

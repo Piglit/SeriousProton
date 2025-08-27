@@ -36,6 +36,7 @@ public:
     };
     std::vector<string> getScenarios();
     nlohmann::json getCampaign();
+    std::map<string, string> getScenarioScore(string name);
     std::map<string, string> getScenarioInfo(string name);
     std::map<string, std::vector<string> > getScenarioSettings(string name);
     std::vector<string> getShips();

@@ -141,10 +141,23 @@ nlohmann::json CampaignClient::getCampaign()
     return httpGetJson(path);
 }
 
+std::map<string, string> CampaignClient::getScenarioScore(string name)
+{
+    string path = string("/score/")+instance_name_url+"/"+urlencode(name);
+    auto result_json = httpGetJson(path);
+    LOG(INFO) << result_json.dump();
+    std::map<string, string> kvpairs;
+    for (auto& [key, value] : result_json.items()){
+        kvpairs[key] = value.get<std::string>();
+    }
+    return kvpairs;
+}
+
 std::map<string, string> CampaignClient::getScenarioInfo(string name)
 {
     string path = string("/scenario_info/")+instance_name_url+"/"+urlencode(name);
     auto result_json = httpGetJson(path);
+    //LOG(INFO) << result_json.dump();
     auto result_map = result_json["scenarioInfo"];
     std::map<string, string> kvpairs;
     for (auto& [key, value] : result_map.items()){
