@@ -2,7 +2,7 @@ name: CMake
 
 on:
   push:
-    branches: [lan24]
+    branches: [lan25]
   pull_request:
 
 jobs:
