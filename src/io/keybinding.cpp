@@ -274,7 +274,7 @@ string Keybinding::getHumanReadableKeyName(int index) const
         case joystick_axis_mask:
             return "Axis " + string(data & 0xff);
         case joystick_button_mask:
-            return "Button " + string(data & 0xff);
+            return "Button " + string((data & 0xff) +1);
         case mouse_movement_mask:
             switch(data)
             {
