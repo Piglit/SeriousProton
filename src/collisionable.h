@@ -38,6 +38,7 @@ public:
     virtual ~Collisionable();
     virtual void collide(Collisionable* target, float force);
 
+    void setCollisionTypeStatic();
     void setCollisionRadius(float radius);
     void setCollisionBox(glm::vec2 box_size, glm::vec2 box_origin = glm::vec2(0, 0));
     void setCollisionShape(const std::vector<glm::vec2>& shape);

@@ -161,6 +161,11 @@ Collisionable::~Collisionable()
     destroyBody();
 }
 
+void Collisionable::setCollisionTypeStatic()
+{
+    body->SetType(b2_staticBody);
+}
+
 void Collisionable::setCollisionRadius(float radius)
 {
     if (radius <= 0)
