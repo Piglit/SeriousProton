@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <set>
 #include <SDL.h>
 
 #ifdef ANDROID
@@ -217,11 +218,11 @@ P<ResourceStream> getResourceStream(string filename)
 
 std::vector<string> findResources(string searchPattern)
 {
-    std::vector<string> foundFiles;
+    std::set<string> found_files;
     foreach(ResourceProvider, rp, resourceProviders)
     {
         std::vector<string> res = rp->findResources(searchPattern);
-        foundFiles.insert(foundFiles.end(), res.begin(), res.end());
+        found_files.insert(res.begin(), res.end());
     }
-    return foundFiles;
+    return std::vector(found_files.begin(), found_files.end());
 }
